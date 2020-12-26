@@ -5,15 +5,17 @@ from django.db.models import Count, Avg, Max, Min, Sum
 from django.contrib.auth import authenticate, login, logout
 from .models import User
 from django.contrib import messages
-
+from datetime import datetime
+from .models import BoardList
 
 # models.py에서 만든 DB 테이블의 데이터를 처리하는 로직을 만들 수 있다.
 # Create your views here.
+# 로그인
 def index(request):
     if request.method == 'GET':
         # 로그인 상태 확인
         if request.user.is_authenticated:
-            return render(request, 'board/boardlist.html')
+            return redirect('boardlist')
         else:
             return render(request, 'board/index.html')
 
@@ -27,16 +29,22 @@ def index(request):
         # 계정이 일치 확인
         if user is not None:
             login(request, user)
-            return render(request, 'board/boardlist.html')
+            res = JsonResponse({'message': 1})
+            return res
         else:
-            return render(request, 'board/index.html')
+            print('들어옴')
+            messages.info(request, '아이디를 확인해주세요.')
+            res = JsonResponse({'message': 0})
+            return res
 
 
+# 로그아웃
 def logout_action(request):
     logout(request)
     return redirect('index')
 
 
+# 회원가입
 def signup(request):
     if request.method == 'GET':
         return render(request, 'board/signupform.html')
@@ -66,6 +74,7 @@ def signup(request):
             return HttpResponse(res)
 
 
+# 게시판 뷰
 def boardlist(request):
     if request.method == 'GET':
         if request.user.is_authenticated:
@@ -74,4 +83,36 @@ def boardlist(request):
             return redirect('index')
 
 
+# 게시물 작성하기
+def board_edit(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated:
+            return render(request, 'board/board_edit.html')
+        else:
+            return redirect('index')
+    elif  request.method == 'POST':
+        if request.user.is_authenticated:
+            form_data = BoardList()
+            form_data.email = request.user.username
+            form_data.board_title = request.POST['title']
+            form_data.board_contents = request.POST['content']
 
+            files = request.FILES.getlist('file')
+
+            for i in range(len(files)):
+                if i == 0:
+                    form_data.file1 = request.FILES.getlist('file')[i]
+                elif i == 1:
+                    form_data.file2 = request.FILES.getlist('file')[i]
+                elif i == 2:
+                    form_data.file3 = request.FILES.getlist('file')[i]
+                elif i == 3:
+                    form_data.file4 = request.FILES.getlist('file')[i]
+                elif i == 4:
+                    form_data.file5 = request.FILES.getlist('file')[i]
+
+            form_data.save()
+
+            return redirect('boardlist')
+        else:
+            return redirect('index')
