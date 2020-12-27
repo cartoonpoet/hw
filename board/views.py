@@ -7,6 +7,7 @@ from .models import User
 from django.contrib import messages
 from datetime import datetime
 from .models import BoardList
+import math
 
 # models.py에서 만든 DB 테이블의 데이터를 처리하는 로직을 만들 수 있다.
 # Create your views here.
@@ -78,7 +79,13 @@ def signup(request):
 def boardlist(request):
     if request.method == 'GET':
         if request.user.is_authenticated:
-            return render(request, 'board/boardlist.html')
+            board_data = BoardList.objects.all().order_by('-id')[:10]
+            board_cnt = BoardList.objects.all().aggregate(Count('id'))
+            data_num = board_cnt['id__count']
+            board_cnt['id__count'] /= 10
+            board_cnt['id__count'] = math.ceil(board_cnt['id__count'])
+
+            return render(request, 'board/boardlist.html', {'board_data':board_data, 'ranges':range(1, board_cnt['id__count']+1), 'current_page':1, 'data_num':data_num})
         else:
             return redirect('index')
 

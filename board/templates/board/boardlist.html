@@ -19,7 +19,7 @@
             <span><a href="">내 정보</a></span>
             <br>
             <div class="search">
-                <span>□ 총 ?건의 게시물</span>
+                <span>□ 총 {{ data_num }}건의 게시물</span>
                 <form action="" method="">
                     <select name="type" id="" class="search_type">
                         <option value="title">제목</option>
@@ -35,72 +35,25 @@
                 <span class="board_title">제목</span>
                 <span class="board_date">작성일</span>
             </div>
+            {% for i in board_data %}
             <div class="post">
-                <span>10</span>
-                <span><a href="">게시물</a></span>
-                <span>2111-11-11</span>
+                <span>{{ i.id }}</span>
+                <span><a href="">{{ i.board_title }}</a></span>
+                <span>{{ i.board_date | date:'yy-m-d, H:i' }}</span>
             </div>
-                        <div class="post">
-                <span>10</span>
-                <span><a href="">게시물</a></span>
-                <span>2111-11-11</span>
-            </div>
-                        <div class="post">
-                <span>10</span>
-                <span><a href="">게시물</a></span>
-                <span>2111-11-11</span>
-            </div>
-                        <div class="post">
-                <span>10</span>
-                <span><a href="">게시물</a></span>
-                <span>2111-11-11</span>
-            </div>
-                        <div class="post">
-                <span>10</span>
-                <span><a href="">게시물</a></span>
-                <span>2111-11-11</span>
-            </div>
-                        <div class="post">
-                <span>10</span>
-                <span><a href="">게시물</a></span>
-                <span>2111-11-11</span>
-            </div>
-                        <div class="post">
-                <span>10</span>
-                <span><a href="">게시물</a></span>
-                <span>2111-11-11</span>
-            </div>
-                        <div class="post">
-                <span>10</span>
-                <span><a href="">게시물</a></span>
-                <span>2111-11-11</span>
-            </div>
-                        <div class="post">
-                <span>10</span>
-                <span><a href="">게시물</a></span>
-                <span>2111-11-11</span>
-            </div>
-                        <div class="post">
-                <span>10</span>
-                <span><a href="">게시물</a></span>
-                <span>2111-11-11</span>
-            </div>
+            {% endfor %}
                 <div class="page_num">
                     <a href="#" class="pre">&lt; 이전</a>
-                    <a href="#" class="numbers selected">1</a>
-                    <a href="#" class="numbers">2</a>
-                    <a href="#" class="numbers">3</a>
-                    <a href="#" class="numbers">4</a>
-                    <a href="#" class="numbers">5</a>
-                    <a href="#" class="numbers">6</a>
-                    <a href="#" class="numbers">7</a>
-                    <a href="#" class="numbers">8</a>
-                    <a href="#" class="numbers">9</a>
-                    <a href="#" class="numbers">10</a>
+                    {% for i in ranges %}
+                        {% if current_page == i %}
+                        <a href="#" class="numbers selected">{{ i }}</a>
+                        {% else %}
+                        <a href="#" class="numbers">{{ i }}</a>
+                        {% endif %}
+                    {% endfor %}
                     <a href="#" class="next">다음 &gt;</a>
-                    
                 </div>
-                <a href="board_edit/" class="write">작성</a>
+                <a href="board_edit" class="write">작성</a>
         </div>
     </div>
 </body>
