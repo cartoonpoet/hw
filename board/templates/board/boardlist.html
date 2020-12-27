@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/css/commen.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" href="/static/css/boardlist.css">
-    <script type="text/javascript" src="/static/js/boardlist.js?ver=4"></script>
+    <script type="text/javascript" src="/static/js/boardlist.js?ver=5"></script>
 </head>
 <body>
     <div id="wrap">
@@ -20,13 +20,12 @@
             <br>
             <div class="search">
                 <span>□ 총 {{ data_num }}건의 게시물</span>
-                <form action="" method="">
+                <form action="" method="GET">
                     <select name="type" id="" class="search_type">
                         <option value="title">제목</option>
                         <option value="contents">내용</option>
-                        <option value="writer">작성자</option>
                     </select>
-                    <input type="text" class="contents">
+                    <input type="text" class="contents" name="keyword">
                     <input type="button" value="검색" class="searching">
                 </form>
             </div>
@@ -35,7 +34,7 @@
                 <span class="board_title">제목</span>
                 <span class="board_date">작성일</span>
             </div>
-            {% for i in board_data %}
+            {% for i in posts %}
             <div class="post">
                 <span>{{ i.id }}</span>
                 <span><a href="">{{ i.board_title }}</a></span>
@@ -43,15 +42,16 @@
             </div>
             {% endfor %}
                 <div class="page_num">
-                    <a href="#" class="pre">&lt; 이전</a>
-                    {% for i in ranges %}
-                        {% if current_page == i %}
-                        <a href="#" class="numbers selected">{{ i }}</a>
-                        {% else %}
-                        <a href="#" class="numbers">{{ i }}</a>
-                        {% endif %}
+                    {% if posts.has_previous %} <!--첫번째 페이지면-->
+                    <a href="?page={{ posts.previous_page_number }}" class="pre">&lt; 이전</a>
+                    {% endif %}
+                    {% for i in ranges %} <!--페이지 번호-->
+{#                        <a href="?page={{ i }}" class="numbers selected">{{ i }}</a>#}
+                        <a href="?page={{ i }}" class="numbers {% if i == posts.number %}selected{% endif %}">{{ i }}</a>
                     {% endfor %}
-                    <a href="#" class="next">다음 &gt;</a>
+                {% if posts.has_next %}<!--마지막 페이지와 현재 페이지가 다르면-->
+                    <a href="?page={{ posts.next_page_number }}" class="next">다음 &gt;</a>
+                {% endif %}
                 </div>
                 <a href="board_edit" class="write">작성</a>
         </div>

@@ -8,6 +8,8 @@ from django.contrib import messages
 from datetime import datetime
 from .models import BoardList
 import math
+from django.core.paginator import Paginator
+
 
 # models.py에서 만든 DB 테이블의 데이터를 처리하는 로직을 만들 수 있다.
 # Create your views here.
@@ -79,13 +81,41 @@ def signup(request):
 def boardlist(request):
     if request.method == 'GET':
         if request.user.is_authenticated:
-            board_data = BoardList.objects.all().order_by('-id')[:10]
+            board_data = BoardList.objects.all().order_by('-id') # 게시물 정보
             board_cnt = BoardList.objects.all().aggregate(Count('id'))
-            data_num = board_cnt['id__count']
+            data_num = board_cnt['id__count'] # 게시물 개수
             board_cnt['id__count'] /= 10
-            board_cnt['id__count'] = math.ceil(board_cnt['id__count'])
+            board_cnt['id__count'] = math.ceil(board_cnt['id__count']) # 페이지 수
 
-            return render(request, 'board/boardlist.html', {'board_data':board_data, 'ranges':range(1, board_cnt['id__count']+1), 'current_page':1, 'data_num':data_num})
+            paginator = Paginator(board_data, 10)
+            page = request.GET.get('page')
+            if page is None:
+                page = 1
+            posts = paginator.get_page(page)
+
+            # if request.GET.get('keyword') is not None: # 검색일 경우
+            #     type = request.GET.get('type')
+            #     keyword = request.GET.get('keyword')
+            #
+            #     if type == 'title':
+            #         board_data = BoardList.objects.filter(board_title=keyword).all()
+            #         board_cnt = BoardList.objects.filter(board_title=keyword).aggregate(Count('id'))
+            #     elif type == 'contents':
+            #         board_data = BoardList.objects.filter(board_contents=keyword).all()
+            #         board_cnt = BoardList.objects.filter(board_contents=keyword).aggregate(Count('id'))
+            #
+            #     board_cnt['id__count'] /= 10
+            #     board_cnt['id__count'] = math.ceil(board_cnt['id__count'])  # 페이지 수
+            #
+            #     paginator = Paginator(board_data, 10)
+            #     page = request.GET.get('page')
+            #     if page is None:
+            #         page = 1
+            #     posts = paginator.get_page(page)
+            #
+            #     return render(request, 'board/boardlist.html', {'ranges': range(1, board_cnt['id__count'] + 1), 'data_num': data_num, 'posts': posts, 'type': type, 'keyword': keyword})
+
+            return render(request, 'board/boardlist.html', {'ranges':range(1, board_cnt['id__count']+1), 'data_num':data_num, 'posts':posts})
         else:
             return redirect('index')
 
